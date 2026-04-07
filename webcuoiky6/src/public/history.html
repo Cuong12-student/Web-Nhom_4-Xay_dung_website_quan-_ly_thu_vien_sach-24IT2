@@ -1,0 +1,59 @@
+<!-- history.html - Lịch sử mượn trả với menu dọc -->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch sử mượn - Thư viện Đại học CMC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body.dark-mode .top-bar, body.dark-mode .filter-bar, body.dark-mode .history-table,
+        body.dark-mode .reader-detail-card { background: #2d2d44; color: #e0e0e0; }
+        body.dark-mode .history-table th { background: #1a1a2e; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="sidebar-header"><h2><i class="fas fa-book-open"></i> Thư viện</h2><p>Đại học CMC</p></div>
+            <div class="sidebar-menu">
+                <a href="dashboard.html" class="menu-item"><i class="fas fa-tachometer-alt"></i><span>Trang chủ</span></a>
+                <a href="books.html" class="menu-item"><i class="fas fa-book"></i><span>Quản lý sách</span></a>
+                <a href="readers.html" class="menu-item"><i class="fas fa-users"></i><span>Quản lý độc giả</span></a>
+                <a href="borrow.html" class="menu-item"><i class="fas fa-exchange-alt"></i><span>Mượn/Trả sách</span></a>
+                <a href="history.html" class="menu-item active"><i class="fas fa-history"></i><span>Lịch sử mượn</span></a>
+                <div class="menu-divider"></div>
+                <a href="reports.html" class="menu-item"><i class="fas fa-chart-line"></i><span>Báo cáo</span></a>
+                <a href="settings.html" class="menu-item"><i class="fas fa-cog"></i><span>Cài đặt</span></a>
+                <div class="menu-divider"></div>
+                <a href="#" id="logoutBtn" class="menu-item"><i class="fas fa-sign-out-alt"></i><span>Đăng xuất</span></a>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="top-bar">
+                <div class="page-title"><h1><i class="fas fa-history"></i> Lịch sử mượn/trả</h1><p>Theo dõi toàn bộ lịch sử giao dịch</p></div>
+                <div class="user-info"><div class="user-avatar"><i class="fas fa-user"></i></div><span class="user-name" id="userName">Admin</span><button id="darkModeToggle" class="logout-btn" style="background:none; font-size:1.2rem;"><i class="fas fa-moon"></i></button></div>
+            </div>
+            <div class="filter-bar">
+                <input type="text" id="readerSearch" placeholder="🔍 Nhập mã thẻ hoặc tên độc giả...">
+                <button class="btn" onclick="searchReaderDetail()"><i class="fas fa-search"></i> Tra cứu độc giả</button>
+                <select id="statusFilter" onchange="loadHistory()"><option value="">Tất cả trạng thái</option><option value="borrowed">Đang mượn</option><option value="returned">Đã trả</option></select>
+            </div>
+            <div id="readerDetail" class="reader-detail-card"></div>
+            <div style="overflow-x:auto">
+                <table class="history-table">
+                    <thead><tr><th>Mã phiếu</th><th>Sách</th><th>Mã vạch</th><th>Độc giả</th><th>Ngày mượn</th><th>Hạn trả</th><th>Ngày trả</th><th>Trạng thái</th><th>Tiền phạt</th><th>Thao tác</th></tr></thead>
+                    <tbody id="historyList"><tr><td colspan="10" style="text-align:center">Đang tải...</td></tr></tbody>
+                </table>
+            </div>
+            <footer><p>&copy; 2026 - Hệ thống Quản lý Thư viện Đại học CMC</p></footer>
+        </div>
+    </div>
+    <script src="js/auth.js"></script>
+    <script src="js/bookService.js"></script>
+    <script src="js/readerService.js"></script>
+    <script src="js/borrowService.js"></script>
+    <script src="js/history.js"></script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!-- borrow.html - Mượn/Trả sách với menu dọc -->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mượn/Trả sách - Thư viện Đại học CMC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>     
+        body.dark-mode .top-bar, body.dark-mode .tab-container, body.dark-mode .tab-pane,
+        body.dark-mode .search-card, body.dark-mode .borrow-table, body.dark-mode .modal-content {
+            background: #2d2d44; color: #e0e0e0;
+        }
+        body.dark-mode .tab-btn:not(.active) { background: #1a1a2e; color: #e0e0e0; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-book-open"></i> Thư viện</h2>
+                <p>Đại học CMC</p>
+            </div>
+            <div class="sidebar-menu">
+                <a href="dashboard.html" class="menu-item"><i class="fas fa-tachometer-alt"></i><span>Trang chủ</span></a>
+                <a href="books.html" class="menu-item"><i class="fas fa-book"></i><span>Quản lý sách</span></a>
+                <a href="readers.html" class="menu-item"><i class="fas fa-users"></i><span>Quản lý độc giả</span></a>
+                <a href="borrow.html" class="menu-item active"><i class="fas fa-exchange-alt"></i><span>Mượn/Trả sách</span></a>
+                <a href="history.html" class="menu-item"><i class="fas fa-history"></i><span>Lịch sử mượn</span></a>
+                <div class="menu-divider"></div>
+                <a href="reports.html" class="menu-item"><i class="fas fa-chart-line"></i><span>Báo cáo</span></a>
+                <a href="settings.html" class="menu-item"><i class="fas fa-cog"></i><span>Cài đặt</span></a>
+                <div class="menu-divider"></div>
+                <a href="#" id="logoutBtn" class="menu-item"><i class="fas fa-sign-out-alt"></i><span>Đăng xuất</span></a>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="top-bar">
+                <div class="page-title">
+                    <h1><i class="fas fa-exchange-alt"></i> Mượn/Trả sách</h1>
+                    <p>Quản lý quá trình mượn và trả sách, tính phí phạt quá hạn</p>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar"><i class="fas fa-user"></i></div>
+                    <span class="user-name" id="userName">Admin</span>
+                    <button id="darkModeToggle" class="logout-btn" style="background:none; font-size:1.2rem;"><i class="fas fa-moon"></i></button>
+                </div>
+            </div>
+
+            <div class="tab-container">
+                <button class="tab-btn active" onclick="switchTab('borrow')"><i class="fas fa-hand-holding-heart"></i> Cho mượn sách</button>
+                <button class="tab-btn" onclick="switchTab('return')"><i class="fas fa-undo-alt"></i> Nhận trả sách</button>
+                <button class="tab-btn" onclick="switchTab('list')"><i class="fas fa-list"></i> Danh sách mượn</button>
+            </div>
+
+            <!-- Tab Cho mượn -->
+            <div id="borrowTab" class="tab-pane active">
+                <div class="search-card">
+                    <h3><i class="fas fa-qrcode"></i> Quét mã thẻ độc giả</h3>
+                    <div class="search-group">
+                        <input type="text" id="readerSearch" placeholder="Nhập mã thẻ hoặc tên độc giả...">
+                        <button class="btn btn-primary" onclick="searchReader()"><i class="fas fa-search"></i> Tìm kiếm</button>
+                    </div>
+                    <div id="readerInfo" class="info-card"></div>
+                </div>
+                <div class="search-card">
+                    <h3><i class="fas fa-barcode"></i> Quét mã vạch sách</h3>
+                    <div class="search-group">
+                        <input type="text" id="bookSearch" placeholder="Nhập mã vạch hoặc tên sách...">
+                        <button class="btn btn-primary" onclick="searchBook()"><i class="fas fa-search"></i> Tìm kiếm</button>
+                    </div>
+                    <div id="bookInfo" class="info-card"></div>
+                    <div style="margin-top:1rem;text-align:center">
+                        <button class="btn btn-success" id="borrowBtn" onclick="confirmBorrow()" disabled><i class="fas fa-hand-holding-heart"></i> Xác nhận mượn sách</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Nhận trả -->
+            <div id="returnTab" class="tab-pane">
+                <div class="search-card">
+                    <h3><i class="fas fa-qrcode"></i> Quét mã độc giả trả sách</h3>
+                    <div class="search-group">
+                        <input type="text" id="returnSearch" placeholder="Nhập mã thẻ độc giả...">
+                        <button class="btn btn-primary" onclick="searchReturnBook()"><i class="fas fa-search"></i> Tìm kiếm</button>
+                    </div>
+                    <div id="returnInfo" class="info-card"></div>
+                    <div style="margin-top:1rem;text-align:center">
+                        <button class="btn btn-warning" id="returnBtn" onclick="confirmReturn()" disabled><i class="fas fa-undo-alt"></i> Xác nhận trả sách</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Danh sách mượn -->
+            <div id="listTab" class="tab-pane">
+                <div style="display:flex; gap:1rem; margin-bottom:1rem; flex-wrap:wrap">
+                    <input type="text" id="borrowSearch" placeholder="🔍 Tìm theo sách, độc giả..." oninput="loadBorrowList()" style="flex:1; padding:0.6rem; border-radius:10px; border:1px solid #e2e8f0">
+                    <select id="borrowStatusFilter" onchange="loadBorrowList()" style="padding:0.6rem; border-radius:10px">
+                        <option value="">Tất cả</option><option value="borrowed">Đang mượn</option><option value="returned">Đã trả</option>
+                    </select>
+                </div>
+                <div style="overflow-x:auto">
+                    <table class="borrow-table">
+                        <thead><tr><th>Mã phiếu</th><th>Sách</th><th>Độc giả</th><th>Ngày mượn</th><th>Hạn trả</th><th>Ngày trả</th><th>Trạng thái</th><th>Tiền phạt</th><th>Thao tác</th></tr></thead>
+                        <tbody id="borrowList"><tr><td colspan="9" style="text-align:center">Đang tải...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+            <footer><p>&copy; 2026 - Hệ thống Quản lý Thư viện Đại học CMC</p></footer>
+        </div>
+    </div>
+
+    <div id="confirmModal" class="modal" onclick="if(event.target===this) this.classList.remove('show')">
+        <div class="modal-content">
+            <div class="modal-header"><h3 id="confirmTitle">Xác nhận</h3><span class="modal-close" onclick="this.closest('.modal').classList.remove('show')">&times;</span></div>
+            <div class="modal-body" id="confirmBody"></div>
+            <div class="modal-footer"><button class="btn btn-secondary" onclick="closeConfirmModal()">Hủy</button><button class="btn btn-primary" id="confirmActionBtn">Xác nhận</button></div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/bookService.js"></script>
+    <script src="js/readerService.js"></script>
+    <script src="js/borrowService.js"></script>
+    <script src="js/borrow.js"></script>
+</body>
+</html>

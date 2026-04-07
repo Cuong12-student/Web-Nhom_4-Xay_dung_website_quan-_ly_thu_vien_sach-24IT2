@@ -1,0 +1,473 @@
+<!-- dashboard.html - Giao diện quản lý thư viện kiểu mới -->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tổng quan - Thư viện Đại học CMC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>      
+        /* Dark Mode */
+        body.dark-mode .top-bar,
+        body.dark-mode .stat-card,
+        body.dark-mode .card {
+            background: #2d2d44;
+            color: #e0e0e0;
+        }
+        body.dark-mode .page-title h1,
+        body.dark-mode .stat-info h3,
+        body.dark-mode .news-title,
+        body.dark-mode .card-header h3 {
+            color: white;
+        }
+        body.dark-mode .news-item {
+            border-color: #3d3d5c;
+        }
+        body.dark-mode .service-item {
+            background: #3d3d5c;
+            color: #e0e0e0;
+        }
+        body.dark-mode .inbox-btn {
+            background: #1f2a3b;
+            color: #cbd5e1;
+        }
+        body.dark-mode .inbox-panel {
+            background: #1b2436;
+        }
+        body.dark-mode .inbox-item {
+            background: #233047;
+            border-color: #334155;
+        }
+        body.dark-mode .inbox-item.unread {
+            background: #2f2a20;
+        }
+        body.dark-mode .inbox-item-message,
+        body.dark-mode .inbox-item-head strong {
+            color: #e2e8f0;
+        }
+        body.dark-mode .inbox-item-meta,
+        body.dark-mode .inbox-empty {
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- SIDEBAR MENU DỌC BÊN TRÁI -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-book-open"></i> Thư viện</h2>
+                <p>Đại học CMC</p>
+            </div>
+            <div class="sidebar-menu">
+                <a href="dashboard.html" class="menu-item active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Trang chủ</span>
+                </a>
+                <a href="books.html" class="menu-item">
+                    <i class="fas fa-book"></i>
+                    <span>Quản lý sách</span>
+                </a>
+                <a href="readers.html" class="menu-item">
+                    <i class="fas fa-users"></i>
+                    <span>Quản lý độc giả</span>
+                </a>
+                <a href="borrow.html" class="menu-item">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Mượn/Trả sách</span>
+                </a>
+                <a href="history.html" class="menu-item">
+                    <i class="fas fa-history"></i>
+                    <span>Lịch sử mượn</span>
+                </a>
+                <div class="menu-divider"></div>
+                <a href="reports.html" class="menu-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Báo cáo</span>
+                </a>
+                <a href="settings.html" class="menu-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Cài đặt</span>
+                </a>
+                <div class="menu-divider"></div>
+                <a href="#" id="logoutBtn" class="menu-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Đăng xuất</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <!-- TOP BAR -->
+            <div class="top-bar">
+                <div class="page-title">
+                    <h1><i class="fas fa-home"></i> Trang chủ</h1>
+                    <p>Chào mừng bạn đến với hệ thống quản lý thư viện</p>
+                </div>
+                <div class="user-info" id="userInfo">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <span class="user-name" id="userName">Đang tải...</span>
+                    <button id="darkModeToggle" class="logout-btn" style="background:none; border:none; font-size:1.2rem; cursor:pointer;">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STATS CARDS -->
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-icon books"><i class="fas fa-book"></i></div>
+                    <div class="stat-info">
+                        <h3 id="totalBooks">0</h3>
+                        <p>Tổng số sách</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon readers"><i class="fas fa-users"></i></div>
+                    <div class="stat-info">
+                        <h3 id="totalReaders">0</h3>
+                        <p>Tổng độc giả</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon borrowing"><i class="fas fa-hand-holding-heart"></i></div>
+                    <div class="stat-info">
+                        <h3 id="currentBorrows">0</h3>
+                        <p>Đang mượn sách</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon fines"><i class="fas fa-coins"></i></div>
+                    <div class="stat-info">
+                        <h3 id="totalFines">0đ</h3>
+                        <p>Tổng tiền phạt</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2 CỘT: TIN TỨC + DỊCH VỤ -->
+            <div class="two-columns">
+                <!-- Cột trái: Tin tức -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-newspaper"></i> Tin tức</h3>
+                    </div>
+                    <ul class="news-list" id="newsList">
+                        <li class="news-item" onclick="showNews('Thông báo về Hòm thư đảm bảo chất lượng')">
+                            <div class="news-title">📢 Thông báo về "Hòm thư đảm bảo chất lượng của Trường Đại học CMC"</div>
+                            <div class="news-date">15/11/2026</div>
+                        </li>
+                        <li class="news-item" onclick="showNews('Thông báo tổ chức thi lại')">
+                            <div class="news-title">📖 Thông báo tổ chức thi lại Học kỳ Xuân năm học 2025-2026</div>
+                            <div class="news-date">10/11/2026</div>
+                        </li>
+                        <li class="news-item" onclick="showNews('Hoàn thành phiếu khảo sát')">
+                            <div class="news-title">📝 Hoàn thành phiếu khảo sát đánh giá hoạt động giảng dạy</div>
+                            <div class="news-date">05/11/2026</div>
+                        </li>
+                        <li class="news-item" onclick="showNews('Khai báo hồ sơ nhập học')">
+                            <div class="news-title">📋 Khai báo Hồ sơ nhập học năm học 2025-2026</div>
+                            <div class="news-date">01/11/2026</div>
+                        </li>
+                        <li class="news-item" onclick="showNews('Thông tin chờ ở')">
+                            <div class="news-title">⏰ Thông tin chờ ở ký túc xá</div>
+                            <div class="news-date">28/10/2026</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Cột phải: Dịch vụ -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-concierge-bell"></i> Dịch vụ</h3>
+                    </div>
+                    <div class="service-list">
+                        <a href="books.html" class="service-item">
+                            <i class="fas fa-book"></i>
+                            <span>Quản lý sách</span>
+                        </a>
+                        <a href="readers.html" class="service-item">
+                            <i class="fas fa-users"></i>
+                            <span>Quản lý độc giả</span>
+                        </a>
+                        <a href="borrow.html" class="service-item">
+                            <i class="fas fa-hand-holding-heart"></i>
+                            <span>Mượn sách</span>
+                        </a>
+                        <a href="reports.html" class="service-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Báo cáo</span>
+                        </a>
+                        <a href="history.html" class="service-item">
+                            <i class="fas fa-history"></i>
+                            <span>Lịch sử</span>
+                        </a>
+                        <a href="settings.html" class="service-item">
+                            <i class="fas fa-cog"></i>
+                            <span>Cài đặt</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2 CỘT: TOP SÁCH + TOP ĐỘC GIẢ -->
+            <div class="two-columns">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-trophy"></i> Top sách mượn nhiều nhất</h3>
+                    </div>
+                    <ul class="top-list" id="topBooksList">
+                        <li><div style="text-align:center;padding:1rem">Đang tải...</div></li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-star"></i> Top độc giả tích cực</h3>
+                    </div>
+                    <ul class="top-list" id="topReadersList">
+                        <li><div style="text-align:center;padding:1rem">Đang tải...</div></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- BIỂU ĐỒ -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-pie"></i> Thống kê sách theo thể loại</h3>
+                </div>
+                <canvas id="categoryChart" height="200"></canvas>
+            </div>
+            <footer><p>&copy; 2026 - Hệ thống Quản lý Thư viện Đại học CMC</p></footer>
+        </div>
+    </div>
+
+    <div id="inboxModal" class="inbox-modal" onclick="if(event.target===this) closeInboxModal()">
+        <div class="inbox-panel" onclick="event.stopPropagation()">
+            <div class="inbox-header">
+                <h3><i class="fas fa-inbox"></i> Hòm thư liên hệ</h3>
+                <button class="logout-btn" style="color:white; font-size:1.2rem;" onclick="closeInboxModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="inboxList" class="inbox-list"></div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/bookService.js"></script>
+    <script src="js/readerService.js"></script>
+    <script src="js/borrowService.js"></script>
+
+    <script>
+        let categoryChart = null;
+        const CONTACT_MESSAGES_KEY = 'library_contact_messages';
+
+        function showToast(msg, isErr = false) {
+            let toast = document.createElement('div');
+            toast.className = `toast-notification ${isErr ? 'error' : ''}`;
+            toast.innerHTML = `<i class="fas ${isErr ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i> ${msg}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function showNews(title) {
+            showToast(`📰 ${title}`, false);
+        }
+
+        function updateDashboard() {
+            // Thống kê sách
+            let books = bookService.getAllBooks();
+            let totalBooks = books.length;
+            let availableBooks = books.filter(b => b.status === 'available').length;
+            
+            // Thống kê độc giả
+            let readers = readerService.getAllReaders();
+            let totalReaders = readers.length;
+            
+            // Thống kê mượn
+            let borrows = borrowService.getAllBorrowRecords();
+            let currentBorrows = borrows.filter(b => b.status === 'borrowed').length;
+            let totalFines = readers.reduce((sum, r) => sum + (r.totalFines || 0), 0);
+            
+            document.getElementById('totalBooks').textContent = totalBooks;
+            document.getElementById('totalReaders').textContent = totalReaders;
+            document.getElementById('currentBorrows').textContent = currentBorrows;
+            document.getElementById('totalFines').textContent = totalFines.toLocaleString() + 'đ';
+            
+            // Top sách mượn nhiều
+            let topBooks = [...books].sort((a,b) => b.borrowedCount - a.borrowedCount).slice(0,5);
+            let topBooksHtml = topBooks.map((book, i) => `
+                <li class="top-item">
+                    <span><span class="rank">${i+1}</span> <span class="name">${book.title.length > 25 ? book.title.substring(0,25)+'...' : book.title}</span></span>
+                    <span class="count">${book.borrowedCount} lượt</span>
+                </li>
+            `).join('');
+            if(topBooks.length === 0) topBooksHtml = '<li style="text-align:center;padding:1rem">Chưa có dữ liệu</li>';
+            document.getElementById('topBooksList').innerHTML = topBooksHtml;
+            
+            // Top độc giả tích cực
+            let topReaders = [...readers].sort((a,b) => b.borrowedCount - a.borrowedCount).slice(0,5);
+            let topReadersHtml = topReaders.map((reader, i) => `
+                <li class="top-item">
+                    <span><span class="rank">${i+1}</span> <span class="name">${reader.fullName.length > 25 ? reader.fullName.substring(0,25)+'...' : reader.fullName}</span></span>
+                    <span class="count">${reader.borrowedCount} lượt</span>
+                </li>
+            `).join('');
+            if(topReaders.length === 0) topReadersHtml = '<li style="text-align:center;padding:1rem">Chưa có dữ liệu</li>';
+            document.getElementById('topReadersList').innerHTML = topReadersHtml;
+            
+            // Biểu đồ thể loại
+            let categoryMap = {};
+            books.forEach(book => {
+                let cat = book.category || 'Khác';
+                categoryMap[cat] = (categoryMap[cat] || 0) + 1;
+            });
+            let categories = Object.keys(categoryMap);
+            let counts = categories.map(c => categoryMap[c]);
+            
+            let ctx = document.getElementById('categoryChart').getContext('2d');
+            if(categoryChart) categoryChart.destroy();
+            categoryChart = new Chart(ctx, {
+                type: 'pie',
+                data: { labels: categories, datasets: [{ data: counts, backgroundColor: ['#667eea','#f093fb','#4facfe','#fa709a','#43e97b','#f9c74f'] }] },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } }
+            });
+        }
+
+        // Dark mode
+        function initDarkMode() {
+            // Dùng cơ chế theme chung để đồng bộ với trang Cài đặt và các trang khác
+            authService.initTheme?.();
+        }
+
+        // User info
+        function updateUserInfo() {
+            let user = authService.getCurrentUser();
+            let nameSpan = document.getElementById('userName');
+            if(user) nameSpan.textContent = user.fullName || user.username;
+            else nameSpan.textContent = 'Khách';
+        }
+
+        function escapeInboxText(value) {
+            if (typeof value !== 'string') return '';
+            return value.replace(/[&<>"']/g, (ch) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[ch]));
+        }
+
+        function getContactMessages() {
+            const raw = localStorage.getItem(CONTACT_MESSAGES_KEY);
+            if (!raw) return [];
+
+            try {
+                const parsed = JSON.parse(raw);
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveContactMessages(messages) {
+            localStorage.setItem(CONTACT_MESSAGES_KEY, JSON.stringify(messages));
+        }
+
+        function updateInboxCount() {
+            const countEl = document.getElementById('inboxCount');
+            if (!countEl) return;
+
+            const unread = getContactMessages().filter(msg => !msg.read).length;
+            countEl.textContent = unread > 99 ? '99+' : String(unread);
+            countEl.style.display = unread > 0 ? 'inline-flex' : 'none';
+        }
+
+        function renderInboxMessages() {
+            const listEl = document.getElementById('inboxList');
+            if (!listEl) return;
+
+            const messages = getContactMessages();
+            if (!messages.length) {
+                listEl.innerHTML = '<div class="inbox-empty">Chưa có tin nhắn nào từ trang Liên hệ.</div>';
+                return;
+            }
+
+            listEl.innerHTML = messages.map((msg) => {
+                const sentAt = msg.createdAt ? new Date(msg.createdAt).toLocaleString('vi-VN') : '-';
+                const unreadClass = msg.read ? '' : ' unread';
+
+                return `
+                    <div class="inbox-item${unreadClass}">
+                        <div class="inbox-item-head">
+                            <strong>${escapeInboxText(msg.subject || 'Không có chủ đề')}</strong>
+                            <span>${sentAt}</span>
+                        </div>
+                        <div class="inbox-item-meta">
+                            Từ: ${escapeInboxText(msg.name || 'Ẩn danh')} - ${escapeInboxText(msg.email || 'Không có email')}
+                        </div>
+                        <div class="inbox-item-message">${escapeInboxText(msg.message || '')}</div>
+                        <div class="inbox-item-actions">
+                            ${msg.read ? '' : `<button class="inbox-action read" onclick="markMessageAsRead('${msg.id}')">Đánh dấu đã đọc</button>`}
+                            <button class="inbox-action delete" onclick="deleteMessage('${msg.id}')">Xóa</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openInboxModal() {
+            document.getElementById('inboxModal')?.classList.add('show');
+            renderInboxMessages();
+        }
+
+        function closeInboxModal() {
+            document.getElementById('inboxModal')?.classList.remove('show');
+        }
+
+        function markMessageAsRead(messageId) {
+            const messages = getContactMessages();
+            const updated = messages.map((msg) => msg.id === messageId ? { ...msg, read: true } : msg);
+            saveContactMessages(updated);
+            updateInboxCount();
+            renderInboxMessages();
+        }
+
+        function deleteMessage(messageId) {
+            const messages = getContactMessages().filter((msg) => msg.id !== messageId);
+            saveContactMessages(messages);
+            updateInboxCount();
+            renderInboxMessages();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            let user = authService.getCurrentUser();
+            if(!user) { window.location.href = 'login.html'; return; }
+            
+            updateDashboard();
+            updateUserInfo();
+            initDarkMode();
+            updateInboxCount();
+
+            document.getElementById('inboxBtn')?.addEventListener('click', openInboxModal);
+            
+            document.getElementById('logoutBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                authService.logout();
+                window.location.href = 'login.html';
+            });
+        });
+
+        window.openInboxModal = openInboxModal;
+        window.closeInboxModal = closeInboxModal;
+        window.markMessageAsRead = markMessageAsRead;
+        window.deleteMessage = deleteMessage;
+    </script>
+</body>
+</html>

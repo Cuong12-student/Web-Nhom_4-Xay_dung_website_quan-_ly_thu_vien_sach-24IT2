@@ -1,0 +1,77 @@
+<!-- settings.html - Cài đặt với menu dọc -->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cài đặt - Thư viện Đại học CMC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body.dark-mode .top-bar, body.dark-mode .settings-card, body.dark-mode .danger-zone { background: #2d2d44; color: #e0e0e0; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="sidebar-header"><h2><i class="fas fa-book-open"></i> Thư viện</h2><p>Đại học CMC</p></div>
+            <div class="sidebar-menu">
+                <a href="dashboard.html" class="menu-item"><i class="fas fa-tachometer-alt"></i><span>Trang chủ</span></a>
+                <a href="books.html" class="menu-item"><i class="fas fa-book"></i><span>Quản lý sách</span></a>
+                <a href="readers.html" class="menu-item"><i class="fas fa-users"></i><span>Quản lý độc giả</span></a>
+                <a href="borrow.html" class="menu-item"><i class="fas fa-exchange-alt"></i><span>Mượn/Trả sách</span></a>
+                <a href="history.html" class="menu-item"><i class="fas fa-history"></i><span>Lịch sử mượn</span></a>
+                <div class="menu-divider"></div>
+                <a href="reports.html" class="menu-item"><i class="fas fa-chart-line"></i><span>Báo cáo</span></a>
+                <a href="settings.html" class="menu-item active"><i class="fas fa-cog"></i><span>Cài đặt</span></a>
+                <div class="menu-divider"></div>
+                <a href="#" id="logoutBtn" class="menu-item"><i class="fas fa-sign-out-alt"></i><span>Đăng xuất</span></a>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="top-bar">
+                <div class="page-title"><h1><i class="fas fa-cog"></i> Cài đặt hệ thống</h1></div>
+                <div class="user-info"><div class="user-avatar"><i class="fas fa-user"></i></div><span class="user-name" id="userName">Admin</span><button id="darkModeToggle" class="logout-btn" style="background:none; font-size:1.2rem;"><i class="fas fa-moon"></i></button></div>
+            </div>
+            <div class="settings-grid">
+                <div class="settings-card">
+                    <h3><i class="fas fa-sliders-h"></i> Cài đặt chung</h3>
+                    <div class="setting-item"><span class="setting-label">Thời gian mượn tối đa</span><div><input type="number" id="maxBorrowDays" class="setting-input" value="14"> ngày</div></div>
+                    <div class="setting-item"><span class="setting-label">Tiền phạt mỗi ngày</span><div><input type="number" id="finePerDay" class="setting-input" value="5000"> VNĐ</div></div>
+                    <div class="setting-item"><span class="setting-label">Số sách tối đa (SV)</span><div><input type="number" id="maxStudentBooks" class="setting-input" value="5"> cuốn</div></div>
+                    <div class="setting-item"><span class="setting-label">Số sách tối đa (GV)</span><div><input type="number" id="maxTeacherBooks" class="setting-input" value="10"> cuốn</div></div>
+                    <div class="setting-item"><span class="setting-label">Chế độ Dark mode</span><label class="switch"><input type="checkbox" id="darkModeToggleSwitch"><span class="slider"></span></label></div>
+                    <div style="margin-top:1rem"><button class="btn btn-primary" onclick="saveGeneralSettings()"><i class="fas fa-save"></i> Lưu cài đặt</button></div>
+                </div>
+                <div class="settings-card">
+                    <h3><i class="fas fa-database"></i> Quản lý dữ liệu</h3>
+                    <div class="danger-zone"><h4><i class="fas fa-exclamation-triangle"></i> Vùng nguy hiểm</h4>
+                        <div class="setting-item"><span class="setting-label">Xóa toàn bộ dữ liệu</span><button class="btn btn-danger" onclick="clearAllData()"><i class="fas fa-trash-alt"></i> Xóa tất cả</button></div>
+                        <div class="setting-item"><span class="setting-label">Đặt lại dữ liệu mẫu</span><button class="btn btn-warning" onclick="resetSampleData()"><i class="fas fa-undo-alt"></i> Khôi phục mẫu</button></div>
+                    </div>
+                </div>
+                <div class="settings-card">
+                    <h3><i class="fas fa-user-shield"></i> Tài khoản</h3>
+                    <div class="setting-item"><span class="setting-label">Tên đăng nhập</span><span id="currentUsername">-</span></div>
+                    <div class="setting-item"><span class="setting-label">Email</span><span id="currentEmail">-</span></div>
+                    <div class="setting-item"><span class="setting-label">Vai trò</span><span id="currentRole">-</span></div>
+                    <div style="margin-top:1rem"><button class="btn btn-primary" onclick="changePassword()"><i class="fas fa-key"></i> Đổi mật khẩu</button></div>
+                </div>
+                <div class="settings-card">
+                    <h3><i class="fas fa-info-circle"></i> Thông tin hệ thống</h3>
+                    <div class="setting-item"><span class="setting-label">Phiên bản</span><span>2.0.0</span></div>
+                    <div class="setting-item"><span class="setting-label">Tổng số sách</span><span id="totalBooks">-</span></div>
+                    <div class="setting-item"><span class="setting-label">Tổng số độc giả</span><span id="totalReaders">-</span></div>
+                    <div class="setting-item"><span class="setting-label">Tổng số phiếu mượn</span><span id="totalBorrows">-</span></div>
+                </div>
+            </div>
+            <footer><p>&copy; 2026 - Hệ thống Quản lý Thư viện Đại học CMC</p></footer>
+        </div>
+    </div>
+    <script src="js/auth.js"></script>
+    <script src="js/bookService.js"></script>
+    <script src="js/readerService.js"></script>
+    <script src="js/borrowService.js"></script>
+    <script src="js/settings.js"></script>
+</body>
+</html>

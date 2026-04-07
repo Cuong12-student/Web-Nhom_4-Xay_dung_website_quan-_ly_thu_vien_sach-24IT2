@@ -1,0 +1,133 @@
+<!-- books.html - Quản lý sách với menu dọc -->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý sách - Thư viện Đại học CMC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>       
+        body.dark-mode .top-bar,
+        body.dark-mode .filter-bar,
+        body.dark-mode .book-table,
+        body.dark-mode .pagination-container,
+        body.dark-mode .modal-content {
+            background: #2d2d44;
+            color: #e0e0e0;
+        }
+        body.dark-mode .book-table th { background: #1a1a2e; color: #e0e0e0; }
+        body.dark-mode .book-table td { border-color: #3d3d5c; }
+        body.dark-mode .book-category-badge {
+            background: linear-gradient(135deg, #1f3653, #294769);
+            color: #f1f7ff;
+            border-color: rgba(255,255,255,0.12);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+        }
+        body.dark-mode .sortable-header:hover { color: #ffffff; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-book-open"></i> Thư viện</h2>
+                <p>Đại học CMC</p>
+            </div>
+            <div class="sidebar-menu">
+                <a href="dashboard.html" class="menu-item"><i class="fas fa-tachometer-alt"></i><span>Trang chủ</span></a>
+                <a href="books.html" class="menu-item active"><i class="fas fa-book"></i><span>Quản lý sách</span></a>
+                <a href="readers.html" class="menu-item"><i class="fas fa-users"></i><span>Quản lý độc giả</span></a>
+                <a href="borrow.html" class="menu-item"><i class="fas fa-exchange-alt"></i><span>Mượn/Trả sách</span></a>
+                <a href="history.html" class="menu-item"><i class="fas fa-history"></i><span>Lịch sử mượn</span></a>
+                <div class="menu-divider"></div>
+                <a href="reports.html" class="menu-item"><i class="fas fa-chart-line"></i><span>Báo cáo</span></a>
+                <a href="settings.html" class="menu-item"><i class="fas fa-cog"></i><span>Cài đặt</span></a>
+                <div class="menu-divider"></div>
+                <a href="#" id="logoutBtn" class="menu-item"><i class="fas fa-sign-out-alt"></i><span>Đăng xuất</span></a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="top-bar">
+                <div class="page-title">
+                    <h1><i class="fas fa-book"></i> Quản lý sách</h1>
+                    <p>Quản lý danh mục sách, nhập sách mới, cập nhật thông tin</p>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar"><i class="fas fa-user"></i></div>
+                    <span class="user-name" id="userName">Admin</span>
+                    <button id="darkModeToggle" class="logout-btn" style="background:none; font-size:1.2rem;"><i class="fas fa-moon"></i></button>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="openAddModal()"><i class="fas fa-plus"></i> Thêm sách mới</button>
+            </div>
+
+            <div class="filter-bar">
+                <input type="text" id="searchInput" placeholder="🔍 Tìm theo tên, tác giả, mã vạch..." oninput="loadBooks()">
+                <select id="categoryFilter" onchange="loadBooks()"><option value="">📚 Tất cả thể loại</option></select>
+                <select id="statusFilter" onchange="loadBooks()">
+                    <option value="">📖 Tất cả trạng thái</option>
+                    <option value="available">✅ Có sẵn</option>
+                    <option value="borrowed">📖 Đang mượn</option>
+                    <option value="damaged">⚠️ Hư hỏng</option>
+                </select>
+                <input type="text" id="authorFilter" placeholder="✍️ Tác giả..." oninput="loadBooks()">
+                <input type="text" id="publisherFilter" placeholder="🏢 Nhà xuất bản..." oninput="loadBooks()">
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table class="book-table">
+                    <thead><tr><th>Mã vạch</th><th>Tên sách</th><th>Tác giả</th><th>Thể loại</th><th>NXB / Năm</th><th class="sortable-header" onclick="sortBooksBy('quantity')">Số lượng <span class="sort-indicator" data-sort-indicator="quantity">↕</span></th><th class="sortable-header" onclick="sortBooksBy('borrowedCount')">Lượt mượn <span class="sort-indicator" data-sort-indicator="borrowedCount">↕</span></th><th class="sortable-header" onclick="sortBooksBy('status')">Trạng thái <span class="sort-indicator" data-sort-indicator="status">↕</span></th><th>Thao tác</th></tr></thead>
+                    <tbody id="bookList"><tr><td colspan="9" style="text-align:center;padding:3rem;">Đang tải...</td></tr></tbody>
+                </table>
+            </div>
+
+            <div class="pagination-container">
+                <div><select id="pageSizeSelect" onchange="changePageSize()" style="padding:0.4rem;border-radius:8px;"><option value="10">10 / trang</option><option value="20">20 / trang</option><option value="30">30 / trang</option><option value="50">50 / trang</option></select></div>
+                <div class="pagination-controls">
+                    <button class="page-btn" onclick="goToPage(1)" id="firstPageBtn" disabled><i class="fas fa-angle-double-left"></i></button>
+                    <button class="page-btn" onclick="goToPage(currentPage-1)" id="prevPageBtn" disabled><i class="fas fa-angle-left"></i></button>
+                    <span id="pageInfo">Trang 1 / 1</span>
+                    <button class="page-btn" onclick="goToPage(currentPage+1)" id="nextPageBtn" disabled><i class="fas fa-angle-right"></i></button>
+                    <button class="page-btn" onclick="goToPage(totalPages)" id="lastPageBtn" disabled><i class="fas fa-angle-double-right"></i></button>
+                </div>
+                <div id="recordInfo">Tổng: 0 sách</div>
+            </div>
+            <footer><p>&copy; 2026 - Hệ thống Quản lý Thư viện Đại học CMC</p></footer>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="bookModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h3 id="modalTitle">Thêm sách mới</h3><span class="modal-close" onclick="closeModal()">&times;</span></div>
+            <div class="modal-body">
+                <form id="bookForm">
+                    <input type="hidden" id="bookId">
+                    <div class="form-group"><label>Tên sách *</label><input type="text" id="title" required></div>
+                    <div class="form-group"><label>Tác giả *</label><input type="text" id="author" required></div>
+                    <div class="form-group"><label>Thể loại</label><input type="text" id="category"></div>
+                    <div class="form-group"><label>Nhà xuất bản</label><input type="text" id="publisher"></div>
+                    <div class="form-group"><label>Năm xuất bản</label><input type="number" id="publishYear"></div>
+                    <div class="form-group"><label>ISBN</label><input type="text" id="isbn"></div>
+                    <div class="form-group"><label>Vị trí</label><input type="text" id="location"></div>
+                    <div class="form-group"><label>Số lượng</label><input type="number" id="quantity" value="1"></div>
+                    <div class="form-group"><label>Số sách hư hỏng</label><input type="number" id="damagedCount" value="0" min="0"></div>
+                    <div class="form-group"><label>Mô tả</label><textarea id="description" rows="3"></textarea></div>
+                </form>
+            </div>
+            <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Hủy</button><button class="btn btn-primary" onclick="saveBook()">Lưu</button></div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/bookService.js"></script>
+    <script src="js/borrowService.js"></script>
+    <script src="js/books.js"></script>
+</body>
+</html>

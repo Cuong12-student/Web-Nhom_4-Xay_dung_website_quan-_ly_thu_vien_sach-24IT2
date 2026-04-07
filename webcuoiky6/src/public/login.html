@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - Quản lý Thư viện</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Login Page Specific Styles */
+        .login-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,0,0,0.5)), 
+                        url('../img/library-bg.jpg') center/cover fixed no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            position: relative;
+        }
+        
+        .login-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(44,125,160,0.3), rgba(42,157,143,0.3));
+            pointer-events: none;
+        }
+        
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            max-width: 450px;
+            width: 100%;
+            padding: 2.5rem;
+            animation: slideUp 0.5s ease;
+            position: relative;
+            z-index: 1;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .logo-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #2c3e50, #1a2632);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            box-shadow: 0 10px 20px rgba(44,125,160,0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .logo-icon i {
+            font-size: 2rem;
+            color: white;
+        }
+        
+        .login-header h1 {
+            font-size: 1.75rem;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+        
+        .login-header p {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 0.9rem;
+        }
+        
+        .form-group label i {
+            margin-right: 0.5rem;
+            color: #2c3e50;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .input-wrapper i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #718096;
+            transition: all 0.3s ease;
+        }
+        
+        .input-wrapper input {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 2.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: #2c3e50;
+            box-shadow: 0 0 0 3px rgba(44,62,80,0.1);
+        }
+        
+        .input-wrapper input:focus + i {
+            color: #2c3e50;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #718096;
+            transition: color 0.3s ease;
+            z-index: 2;
+        }
+        
+        .password-toggle:hover {
+            color: #2c3e50;
+        }
+        
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            color: #718096;
+        }
+        
+        .checkbox-label input {
+            margin-right: 0.5rem;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #2c3e50;
+        }
+        
+        .forgot-link {
+            color: #2c3e50;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .forgot-link:hover {
+            color: #1a2632;
+            text-decoration: underline;
+        }
+        
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #2c3e50, #1a2632);
+            color: white;
+            border: none;
+            padding: 0.875rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .login-btn:hover::before {
+            left: 100%;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(44,62,80,0.3);
+        }
+        
+        .divider {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background: #e2e8f0;
+        }
+        
+        .divider::before {
+            left: 0;
+        }
+        
+        .divider::after {
+            right: 0;
+        }
+        
+        .divider span {
+            background: white;
+            padding: 0 1rem;
+            color: #718096;
+            font-size: 0.875rem;
+        }
+        
+        .demo-accounts {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .demo-accounts p {
+            font-size: 0.875rem;
+            color: #718096;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .demo-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+        
+        .demo-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            color: #2d3748;
+        }
+        
+        .demo-btn:hover {
+            background: #2c3e50;
+            color: white;
+            border-color: #2c3e50;
+            transform: translateY(-2px);
+        }
+        
+        .login-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .login-footer p {
+            color: #718096;
+            font-size: 0.875rem;
+        }
+        
+        .login-footer a {
+            color: #2c3e50;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        
+        .login-footer a:hover {
+            color: #1a2632;
+            text-decoration: underline;
+        }
+        
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            z-index: 1000;
+            animation: slideInRight 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .toast-notification.error {
+            background: #e74c3c;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 1.5rem;
+            }
+            .demo-buttons {
+                flex-direction: column;
+            }
+            .demo-btn {
+                width: 100%;
+            }
+            .form-options {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+        }
+        
+        .login-btn.loading {
+            position: relative;
+            pointer-events: none;
+        }
+        
+        .login-btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 2px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .shake {
+            animation: shake 0.3s ease;
+        }
+    </style>
+</head>
+<body class="login-page">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="logo-icon">
+                <i class="fas fa-book-open"></i>
+            </div>
+            <h1>Chào mừng trở lại</h1>
+            <p>Đăng nhập để quản lý thư viện của bạn</p>
+        </div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">
+                    <i class="fas fa-user"></i> Tên đăng nhập hoặc Email
+                </label>
+                <div class="input-wrapper">
+                    <i class="fas fa-envelope"></i>
+                    <input type="text" id="username" placeholder="Nhập tên đăng nhập hoặc email" required autocomplete="username">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">
+                    <i class="fas fa-lock"></i> Mật khẩu
+                </label>
+                <div class="input-wrapper">
+                    <i class="fas fa-key"></i>
+                    <input type="password" id="password" placeholder="Nhập mật khẩu" required autocomplete="current-password">
+                    <i class="fas fa-eye password-toggle" onclick="togglePassword()"></i>
+                </div>
+            </div>
+            
+            <div class="form-options">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="rememberMe"> Ghi nhớ đăng nhập
+                </label>
+            </div>
+            
+            <button type="submit" class="login-btn" id="loginBtn">
+                <i class="fas fa-sign-in-alt"></i> Đăng nhập
+            </button>
+        </form>
+        
+        <div class="divider">
+            <span>HOẶC</span>
+        </div>
+        
+        <div class="demo-accounts">
+            <p><i class="fas fa-code-branch"></i> Tài khoản demo</p>
+            <div class="demo-buttons">
+                <button class="demo-btn" onclick="fillDemo('admin', 'admin123')">
+                    <i class="fas fa-user-shield"></i> Admin
+                </button>
+                <button class="demo-btn" onclick="fillDemo('staff', 'staff123')">
+                    <i class="fas fa-user-tie"></i> Staff
+                </button>
+            </div>
+        </div>
+        
+        <div class="login-footer">
+            <p>Chưa có tài khoản? <a href="register.html">Đăng ký ngay</a></p>       
+            <p style="font-size: 0.75rem; margin-top: 0.5rem;">
+                <i class="fas fa-shield-alt"></i> Bảo mật thông tin tuyệt đối
+            </p>
+        </div>
+    </div>
+    
+    <script src="js/auth.js"></script>
+    <script>
+        // Toggle password visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.querySelector('.password-toggle');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+        
+        // Fill demo account
+        function fillDemo(username, password) {
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = password;
+            
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            
+            usernameInput.style.borderColor = '#27ae60';
+            passwordInput.style.borderColor = '#27ae60';
+            
+            setTimeout(() => {
+                usernameInput.style.borderColor = '#e2e8f0';
+                passwordInput.style.borderColor = '#e2e8f0';
+            }, 1000);
+            
+            showToast(`Đã điền tài khoản ${username}`, false);
+        }
+        
+        // Show toast notification
+        function showToast(message, isError = false) {
+            const existingToast = document.querySelector('.toast-notification');
+            if (existingToast) existingToast.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = `toast-notification ${isError ? 'error' : ''}`;
+            toast.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i> ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        // Handle login
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            const loginBtn = document.getElementById('loginBtn');
+            
+            if (!username || !password) {
+                showToast('Vui lòng nhập đầy đủ thông tin', true);
+                document.querySelector('.login-card').classList.add('shake');
+                setTimeout(() => document.querySelector('.login-card').classList.remove('shake'), 300);
+                return;
+            }
+            
+            loginBtn.classList.add('loading');
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang đăng nhập...';
+            
+            setTimeout(() => {
+                const user = authService.login(username, password);
+                
+                if (user) {
+                    if (rememberMe) {
+                        localStorage.setItem('remembered_user', username);
+                    } else {
+                        localStorage.removeItem('remembered_user');
+                    }
+                    
+                    showToast('Đăng nhập thành công! Đang chuyển hướng...');
+                    
+                    // ✅ ĐÃ SỬA: Chuyển đến DASHBOARD.html
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 500);
+                } else {
+                    loginBtn.classList.remove('loading');
+                    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Đăng nhập';
+                    showToast('Sai tên đăng nhập hoặc mật khẩu', true);
+                    
+                    document.querySelector('.login-card').classList.add('shake');
+                    setTimeout(() => document.querySelector('.login-card').classList.remove('shake'), 300);
+                    
+                    document.getElementById('password').value = '';
+                    document.getElementById('password').focus();
+                }
+            }, 500);
+        }
+        
+        // Load remembered user on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Trang đăng nhập luôn dùng giao diện sáng để tránh lệch tương phản
+            document.body.classList.remove('dark-mode');
+
+            const remembered = localStorage.getItem('remembered_user');
+            if (remembered) {
+                document.getElementById('username').value = remembered;
+                document.getElementById('rememberMe').checked = true;
+            }
+            
+            // Attach form submit handler
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            
+            // Add enter key support
+            document.getElementById('password').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleLogin(e);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

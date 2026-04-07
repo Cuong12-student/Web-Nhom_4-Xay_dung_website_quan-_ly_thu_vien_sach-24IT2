@@ -1,0 +1,84 @@
+<!-- reports.html - Báo cáo với menu dọc -->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo - Thư viện Đại học CMC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>      
+        body.dark-mode .top-bar, body.dark-mode .stat-card, body.dark-mode .chart-card, body.dark-mode .top-list { background: #2d2d44; color: #e0e0e0; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="sidebar-header"><h2><i class="fas fa-book-open"></i> Thư viện</h2><p>Đại học CMC</p></div>
+            <div class="sidebar-menu">
+                <a href="dashboard.html" class="menu-item"><i class="fas fa-tachometer-alt"></i><span>Trang chủ</span></a>
+                <a href="books.html" class="menu-item"><i class="fas fa-book"></i><span>Quản lý sách</span></a>
+                <a href="readers.html" class="menu-item"><i class="fas fa-users"></i><span>Quản lý độc giả</span></a>
+                <a href="borrow.html" class="menu-item"><i class="fas fa-exchange-alt"></i><span>Mượn/Trả sách</span></a>
+                <a href="history.html" class="menu-item"><i class="fas fa-history"></i><span>Lịch sử mượn</span></a>
+                <div class="menu-divider"></div>
+                <a href="reports.html" class="menu-item active"><i class="fas fa-chart-line"></i><span>Báo cáo</span></a>
+                <a href="settings.html" class="menu-item"><i class="fas fa-cog"></i><span>Cài đặt</span></a>
+                <div class="menu-divider"></div>
+                <a href="#" id="logoutBtn" class="menu-item"><i class="fas fa-sign-out-alt"></i><span>Đăng xuất</span></a>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="top-bar">
+                <div class="page-title"><h1><i class="fas fa-chart-line"></i> Báo cáo thống kê</h1></div>
+                <div class="user-info"><div class="user-avatar"><i class="fas fa-user"></i></div><span class="user-name" id="userName">Admin</span><button id="darkModeToggle" class="logout-btn" style="background:none; font-size:1.2rem;"><i class="fas fa-moon"></i></button></div>
+            </div>
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-icon books"><i class="fas fa-book"></i></div>
+                    <div class="stat-info">
+                        <h3 id="totalBooks">0</h3>
+                        <p>Tổng số sách</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon readers"><i class="fas fa-users"></i></div>
+                    <div class="stat-info">
+                        <h3 id="totalReaders">0</h3>
+                        <p>Tổng độc giả</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon borrowing"><i class="fas fa-hand-holding-heart"></i></div>
+                    <div class="stat-info">
+                        <h3 id="currentBorrows">0</h3>
+                        <p>Đang mượn sách</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon fines"><i class="fas fa-coins"></i></div>
+                    <div class="stat-info">
+                        <h3 id="totalFines">0đ</h3>
+                        <p>Tổng tiền phạt</p>
+                    </div>
+                </div>
+            </div>
+            <div class="charts-grid">
+                <div class="chart-card"><h3>Thống kê theo thể loại</h3><canvas id="categoryChart"></canvas></div>
+                <div class="chart-card"><h3>Biến động mượn/trả theo tháng</h3><canvas id="monthlyChart"></canvas></div>
+            </div>
+            <div class="top-list"><h3>Top sách mượn nhiều nhất</h3><div id="topBooksList"></div></div>
+            <div class="top-list"><h3>Top độc giả tích cực</h3><div id="topReadersList"></div></div>
+            <div class="top-list"><h3>Sách đang quá hạn</h3><div id="overdueList"></div></div>
+            <footer><p>&copy; 2026 - Hệ thống Quản lý Thư viện Đại học CMC</p></footer>
+        </div>
+    </div>
+    <script src="js/auth.js"></script>
+    <script src="js/bookService.js"></script>
+    <script src="js/readerService.js"></script>
+    <script src="js/borrowService.js"></script>
+    <script src="js/reportService.js"></script>
+    <script src="js/reports.js"></script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!-- readers.html - Quản lý độc giả với menu dọc và chức năng khóa/mở khóa -->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý độc giả - Thư viện Đại học CMC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>     
+        body.dark-mode .top-bar, body.dark-mode .filter-bar, body.dark-mode .reader-table,
+        body.dark-mode .pagination-container, body.dark-mode .modal-content {
+            background: #2d2d44; color: #e0e0e0;
+        }
+        body.dark-mode .reader-table th { background: #1a1a2e; color: #e0e0e0; }
+        body.dark-mode .reader-table td { border-color: #3d3d5c; }
+        body.dark-mode .sortable-header:hover { color: #ffffff; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-book-open"></i> Thư viện</h2>
+                <p>Đại học CMC</p>
+            </div>
+            <div class="sidebar-menu">
+                <a href="dashboard.html" class="menu-item"><i class="fas fa-tachometer-alt"></i><span>Trang chủ</span></a>
+                <a href="books.html" class="menu-item"><i class="fas fa-book"></i><span>Quản lý sách</span></a>
+                <a href="readers.html" class="menu-item active"><i class="fas fa-users"></i><span>Quản lý độc giả</span></a>
+                <a href="borrow.html" class="menu-item"><i class="fas fa-exchange-alt"></i><span>Mượn/Trả sách</span></a>
+                <a href="history.html" class="menu-item"><i class="fas fa-history"></i><span>Lịch sử mượn</span></a>
+                <div class="menu-divider"></div>
+                <a href="reports.html" class="menu-item"><i class="fas fa-chart-line"></i><span>Báo cáo</span></a>
+                <a href="settings.html" class="menu-item"><i class="fas fa-cog"></i><span>Cài đặt</span></a>
+                <div class="menu-divider"></div>
+                <a href="#" id="logoutBtn" class="menu-item"><i class="fas fa-sign-out-alt"></i><span>Đăng xuất</span></a>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="top-bar">
+                <div class="page-title">
+                    <h1><i class="fas fa-users"></i> Quản lý độc giả</h1>
+                    <p>Quản lý thông tin độc giả, khóa/mở khóa thẻ, theo dõi sách đang mượn</p>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar"><i class="fas fa-user"></i></div>
+                    <span class="user-name" id="userName">Admin</span>
+                    <button id="darkModeToggle" class="logout-btn" style="background:none; font-size:1.2rem;"><i class="fas fa-moon"></i></button>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="openAddModal()"><i class="fas fa-user-plus"></i> Thêm độc giả mới</button>
+            </div>
+
+            <div class="filter-bar">
+                <input type="text" id="searchInput" placeholder="🔍 Tìm theo tên, mã thẻ, email, SĐT, CMND..." oninput="loadReaders()">
+                <select id="statusFilter" onchange="loadReaders()">
+                    <option value="">📌 Tất cả trạng thái</option>
+                    <option value="active">✅ Đang hoạt động</option>
+                    <option value="blocked">🔴 Bị khóa</option>
+                    <option value="expired">⚠️ Hết hạn</option>
+                </select>
+                <select id="typeFilter" onchange="loadReaders()">
+                    <option value="">👥 Tất cả loại</option>
+                    <option value="student">🎓 Sinh viên</option>
+                    <option value="teacher">👨‍🏫 Giảng viên</option>
+                    <option value="external">🏢 Bên ngoài</option>
+                </select>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table class="reader-table">
+                    <thead>
+                        <tr>
+                            <th>Mã thẻ</th>
+                            <th>Họ tên</th>
+                            <th>Liên hệ</th>
+                            <th>Loại</th>
+                            <th>Ngày tham gia</th>
+                            <th>Hạn thẻ</th>
+                            <th class="sortable-header" onclick="sortReadersBy('borrowedCount')">Sách mượn <span class="sort-indicator" data-sort-indicator="borrowedCount">↕</span></th>
+                            <th class="sortable-header" onclick="sortReadersBy('outstandingFine')">Nợ phạt <span class="sort-indicator" data-sort-indicator="outstandingFine">↕</span></th>
+                            <th class="sortable-header" onclick="sortReadersBy('status')">Trạng thái <span class="sort-indicator" data-sort-indicator="status">↕</span></th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="readerList">
+                        <tr><td colspan="10" style="text-align:center;padding:3rem;">Đang tải dữ liệu...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination-container">
+                <div>
+                    <select id="pageSizeSelect" onchange="changePageSize()" style="padding:0.4rem;border-radius:8px;">
+                        <option value="10">10 / trang</option>
+                        <option value="20">20 / trang</option>
+                        <option value="30">30 / trang</option>
+                        <option value="50">50 / trang</option>
+                    </select>
+                </div>
+                <div class="pagination-controls">
+                    <button class="page-btn" onclick="goToPage(1)" id="firstPageBtn" disabled><i class="fas fa-angle-double-left"></i></button>
+                    <button class="page-btn" onclick="goToPage(currentPage-1)" id="prevPageBtn" disabled><i class="fas fa-angle-left"></i></button>
+                    <span id="pageInfo">Trang 1 / 1</span>
+                    <button class="page-btn" onclick="goToPage(currentPage+1)" id="nextPageBtn" disabled><i class="fas fa-angle-right"></i></button>
+                    <button class="page-btn" onclick="goToPage(totalPages)" id="lastPageBtn" disabled><i class="fas fa-angle-double-right"></i></button>
+                </div>
+                <div id="recordInfo">Tổng: 0 độc giả</div>
+            </div> 
+            <footer><p>&copy; 2026 - Hệ thống Quản lý Thư viện Đại học CMC</p></footer>          
+        </div>
+    </div>
+    <!-- Modal Thêm/Sửa -->
+    <div id="readerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h3 id="modalTitle">Thêm độc giả mới</h3><span class="modal-close" onclick="closeModal()">&times;</span></div>
+            <div class="modal-body">
+                <form id="readerForm">
+                    <input type="hidden" id="readerId">
+                    <div class="form-group"><label>Họ và tên <span style="color:red">*</span></label><input type="text" id="fullName" required></div>
+                    <div class="form-group"><label>Email</label><input type="email" id="email"></div>
+                    <div class="form-group"><label>Số điện thoại</label><input type="tel" id="phone"></div>
+                    <div class="form-group"><label>Địa chỉ</label><input type="text" id="address"></div>
+                    <div class="form-group"><label>CMND/CCCD</label><input type="text" id="idCard"></div>
+                    <div class="form-group"><label>Loại độc giả</label><select id="memberType"><option value="student">🎓 Sinh viên</option><option value="teacher">👨‍🏫 Giảng viên</option><option value="external">🏢 Bên ngoài</option></select></div>
+                    <div class="form-group"><label>Hạn thẻ</label><input type="date" id="expiryDate"></div>
+                    <div class="form-group"><label>Ghi chú</label><textarea id="notes" rows="2"></textarea></div>
+                </form>
+            </div>
+            <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">Hủy</button><button class="btn btn-primary" onclick="saveReader()">Lưu độc giả</button></div>
+        </div>
+    </div>
+    <script src="js/auth.js"></script>
+    <script src="js/bookService.js"></script>
+    <script src="js/borrowService.js"></script>
+    <script src="js/readerService.js"></script>
+    <script src="js/readers.js"></script>
+</body>
+</html>
